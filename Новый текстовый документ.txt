@@ -1,0 +1,2270 @@
+/* =========================================
+   RO — REFINED OBJECTS
+   GIFT CONCIERGE
+========================================= */
+
+
+/* =========================================
+   STATE
+========================================= */
+
+let currentQuestion = 0;
+let quizAnswers = {};
+
+let currentRecommendations = [];
+let visibleRecommendations = 12;
+let currentCategory = "all";
+
+let savedGifts = JSON.parse(
+  localStorage.getItem("ro_saved_gifts") || "[]"
+);
+
+
+/* =========================================
+   QUIZ QUESTIONS
+========================================= */
+
+const questions = [
+
+  {
+    key: "relationship",
+
+    eyebrow: "01 / RELATIONSHIP",
+
+    title: `
+      Who are you
+      <br>
+      choosing for?
+    `,
+
+    description:
+      "The relationship behind the gesture helps us understand how personal the gift should feel.",
+
+    options: [
+      ["partner", "Partner"],
+      ["family", "Family"],
+      ["friend", "Friend"],
+      ["colleague", "Colleague"],
+      ["special", "Someone special"]
+    ]
+  },
+
+  {
+    key: "budget",
+
+    eyebrow: "02 / BUDGET",
+
+    title: `
+      How much would you
+      <br>
+      like to invest?
+    `,
+
+    description:
+      "There is no right answer. We simply use your range to make the selection more relevant.",
+
+    options: [
+      ["under100", "Under ˆ100"],
+      ["100to300", "ˆ100 — ˆ300"],
+      ["300to1000", "ˆ300 — ˆ1,000"],
+      ["1000plus", "ˆ1,000+"]
+    ]
+  },
+
+  {
+    key: "personality",
+
+    eyebrow: "03 / PERSONALITY",
+
+    title: `
+      How would you
+      <br>
+      describe them?
+    `,
+
+    description:
+      "Think less about what they need and more about what naturally belongs in their world.",
+
+    options: [
+      ["minimalist", "Minimalist"],
+      ["classic", "Classic"],
+      ["creative", "Creative"],
+      ["intellectual", "Intellectual"],
+      ["adventurous", "Adventurous"]
+    ]
+  },
+
+  {
+    key: "interest",
+
+    eyebrow: "04 / INTEREST",
+
+    title: `
+      What are they
+      <br>
+      drawn to?
+    `,
+
+    description:
+      "Choose the area that feels closest to their interests.",
+
+    options: [
+      ["fashion", "Fashion"],
+      ["jewellery", "Jewellery"],
+      ["art", "Art & Design"],
+      ["books", "Books"],
+      ["home", "Interiors"],
+      ["gastronomy", "Gastronomy"],
+      ["experience", "Experiences"]
+    ]
+  },
+
+  {
+    key: "intimacy",
+
+    eyebrow: "05 / THE GESTURE",
+
+    title: `
+      How personal should
+      <br>
+      the gift feel?
+    `,
+
+    description:
+      "Some gifts are quietly thoughtful. Others carry a much more intimate meaning.",
+
+    options: [
+      ["safe", "Thoughtful but safe"],
+      ["personal", "Personal"],
+      ["very-personal", "Deeply personal"]
+    ]
+  },
+
+  {
+    key: "urgency",
+
+    eyebrow: "06 / TIMING",
+
+    title: `
+      When do you need
+      <br>
+      the gift?
+    `,
+
+    description:
+      "Timing helps us understand whether to favour immediately accessible objects or take a little more freedom.",
+
+    options: [
+      ["today", "Today"],
+      ["week", "Within a week"],
+      ["no-rush", "No particular rush"]
+    ]
+  }
+
+];
+
+
+/* =========================================
+   IMAGE LIBRARY
+========================================= */
+
+const images = [
+
+  "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1000&q=85",
+
+  "https://images.unsplash.com/photo-1523779917675-b6ed3a42a561?auto=format&fit=crop&w=1000&q=85",
+
+  "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=85",
+
+  "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&w=1000&q=85",
+
+  "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=85",
+
+  "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1000&q=85",
+
+  "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=1000&q=85",
+
+  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1000&q=85",
+
+  "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1000&q=85",
+
+  "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=1000&q=85",
+
+  "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1000&q=85",
+
+  "https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=1000&q=85"
+
+];
+
+
+/* =========================================
+   GIFT CATALOG
+========================================= */
+
+const gifts = [
+
+  /* =====================
+     FASHION
+  ===================== */
+
+  {
+    id: 1,
+    category: "fashion",
+    brand: "RO EDITION",
+    name: "Structured Leather Card Holder",
+    price: 145,
+    budget: "100to300",
+    image: images[0],
+    description:
+      "A restrained everyday object in smooth leather, chosen for someone who appreciates quiet details.",
+    personalities: ["minimalist", "classic"],
+    interests: ["fashion"],
+    relationships: ["partner", "family", "friend", "colleague"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 2,
+    category: "fashion",
+    brand: "ATELIER NO. 7",
+    name: "Cashmere Travel Scarf",
+    price: 390,
+    budget: "300to1000",
+    image: images[1],
+    description:
+      "Soft cashmere designed to become a discreet companion for travel and colder evenings.",
+    personalities: ["classic", "minimalist"],
+    interests: ["fashion"],
+    relationships: ["partner", "family", "special"],
+    intimacy: ["personal", "very-personal"]
+  },
+
+  {
+    id: 3,
+    category: "fashion",
+    brand: "MAISON RO",
+    name: "Italian Leather Weekender",
+    price: 890,
+    budget: "300to1000",
+    image: images[2],
+    description:
+      "A considered travel piece for someone who values materials, proportion and permanence.",
+    personalities: ["classic", "adventurous"],
+    interests: ["fashion"],
+    relationships: ["partner", "family", "special"],
+    intimacy: ["personal", "very-personal"]
+  },
+
+  {
+    id: 4,
+    category: "fashion",
+    brand: "STUDIO N",
+    name: "Silk Evening Scarf",
+    price: 220,
+    budget: "100to300",
+    image: images[3],
+    description:
+      "A subtle silk accessory with enough character to feel personal without being excessive.",
+    personalities: ["creative", "classic"],
+    interests: ["fashion"],
+    relationships: ["partner", "friend", "family"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 5,
+    category: "fashion",
+    brand: "FORME",
+    name: "Minimal Leather Belt",
+    price: 175,
+    budget: "100to300",
+    image: images[4],
+    description:
+      "A timeless wardrobe piece reduced to its essential form.",
+    personalities: ["minimalist", "classic"],
+    interests: ["fashion"],
+    relationships: ["partner", "family", "colleague"],
+    intimacy: ["safe"]
+  },
+
+  {
+    id: 6,
+    category: "fashion",
+    brand: "ATELIER 21",
+    name: "Merino Travel Knit",
+    price: 310,
+    budget: "300to1000",
+    image: images[5],
+    description:
+      "A refined layer for long journeys, quiet weekends and everyday rituals.",
+    personalities: ["minimalist", "classic"],
+    interests: ["fashion"],
+    relationships: ["partner", "family"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 7,
+    category: "fashion",
+    brand: "RO OBJECTS",
+    name: "Hand-Finished Sunglasses",
+    price: 460,
+    budget: "300to1000",
+    image: images[6],
+    description:
+      "A sculptural accessory for someone with a strong sense of personal style.",
+    personalities: ["creative", "adventurous"],
+    interests: ["fashion"],
+    relationships: ["partner", "friend", "special"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 8,
+    category: "fashion",
+    brand: "CASA 08",
+    name: "Travel Jewellery Case",
+    price: 135,
+    budget: "100to300",
+    image: images[7],
+    description:
+      "A compact leather case designed for thoughtful travel and daily organisation.",
+    personalities: ["minimalist", "classic"],
+    interests: ["fashion", "jewellery"],
+    relationships: ["partner", "family", "friend"],
+    intimacy: ["safe", "personal"]
+  },
+
+
+  /* =====================
+     JEWELLERY
+  ===================== */
+
+  {
+    id: 9,
+    category: "jewellery",
+    brand: "MAISON LUNE",
+    name: "Sculptural Silver Pendant",
+    price: 580,
+    budget: "300to1000",
+    image: images[8],
+    description:
+      "A quiet sculptural pendant intended to feel discovered rather than obvious.",
+    personalities: ["creative", "minimalist"],
+    interests: ["jewellery"],
+    relationships: ["partner", "special"],
+    intimacy: ["personal", "very-personal"]
+  },
+
+  {
+    id: 10,
+    category: "jewellery",
+    brand: "ATELIER R",
+    name: "Fine Gold Signet",
+    price: 1250,
+    budget: "1000plus",
+    image: images[9],
+    description:
+      "A substantial yet restrained piece with the character of something made to last.",
+    personalities: ["classic", "minimalist"],
+    interests: ["jewellery"],
+    relationships: ["partner", "family", "special"],
+    intimacy: ["very-personal"]
+  },
+
+  {
+    id: 11,
+    category: "jewellery",
+    brand: "FORME",
+    name: "Silver Chain Bracelet",
+    price: 340,
+    budget: "300to1000",
+    image: images[10],
+    description:
+      "An understated bracelet designed to become part of someone's everyday wardrobe.",
+    personalities: ["minimalist", "classic"],
+    interests: ["jewellery"],
+    relationships: ["partner", "friend", "family"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 12,
+    category: "jewellery",
+    brand: "LUNE STUDIO",
+    name: "Pearl Detail Earrings",
+    price: 290,
+    budget: "100to300",
+    image: images[11],
+    description:
+      "A delicate interpretation of a familiar form, chosen for someone who appreciates subtle elegance.",
+    personalities: ["classic", "creative"],
+    interests: ["jewellery"],
+    relationships: ["partner", "family", "friend"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 13,
+    category: "jewellery",
+    brand: "NOIR ATELIER",
+    name: "Black Onyx Cuff",
+    price: 720,
+    budget: "300to1000",
+    image: images[2],
+    description:
+      "A darker, architectural piece for someone drawn to distinctive objects.",
+    personalities: ["creative", "adventurous"],
+    interests: ["jewellery"],
+    relationships: ["partner", "special"],
+    intimacy: ["very-personal"]
+  },
+
+  {
+    id: 14,
+    category: "jewellery",
+    brand: "RO PRIVATE",
+    name: "Engraved Keepsake Pendant",
+    price: 640,
+    budget: "300to1000",
+    image: images[4],
+    description:
+      "A discreet personal object intended to carry a private message or date.",
+    personalities: ["minimalist", "classic"],
+    interests: ["jewellery"],
+    relationships: ["partner", "special"],
+    intimacy: ["very-personal"]
+  },
+
+  {
+    id: 15,
+    category: "jewellery",
+    brand: "ATELIER N",
+    name: "Slim Gold Ring",
+    price: 490,
+    budget: "300to1000",
+    image: images[0],
+    description:
+      "A refined everyday ring with an intentionally quiet presence.",
+    personalities: ["minimalist", "classic"],
+    interests: ["jewellery"],
+    relationships: ["partner", "friend", "special"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 16,
+    category: "jewellery",
+    brand: "MAISON EIGHT",
+    name: "Pearl & Silver Brooch",
+    price: 380,
+    budget: "300to1000",
+    image: images[3],
+    description:
+      "A small statement object for someone with an appreciation for unusual details.",
+    personalities: ["creative", "classic"],
+    interests: ["jewellery", "fashion"],
+    relationships: ["friend", "family", "partner"],
+    intimacy: ["personal"]
+  },
+
+
+  /* =====================
+     ART
+  ===================== */
+
+  {
+    id: 17,
+    category: "art",
+    brand: "STUDIO RO",
+    name: "Limited Edition Art Print",
+    price: 180,
+    budget: "100to300",
+    image: images[5],
+    description:
+      "A numbered print selected for quiet interiors and thoughtful collectors.",
+    personalities: ["creative", "minimalist"],
+    interests: ["art"],
+    relationships: ["friend", "partner", "family"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 18,
+    category: "art",
+    brand: "EDITION 04",
+    name: "Architectural Photography Print",
+    price: 290,
+    budget: "100to300",
+    image: images[6],
+    description:
+      "A restrained architectural study for someone fascinated by space and structure.",
+    personalities: ["intellectual", "minimalist"],
+    interests: ["art"],
+    relationships: ["friend", "partner", "colleague"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 19,
+    category: "art",
+    brand: "NORTH STUDIO",
+    name: "Abstract Ceramic Sculpture",
+    price: 740,
+    budget: "300to1000",
+    image: images[10],
+    description:
+      "A tactile sculptural object designed to quietly anchor a room.",
+    personalities: ["creative", "minimalist"],
+    interests: ["art", "home"],
+    relationships: ["partner", "family", "special"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 20,
+    category: "art",
+    brand: "EDITION RO",
+    name: "Artist Monograph",
+    price: 165,
+    budget: "100to300",
+    image: images[7],
+    description:
+      "A beautifully produced volume for someone who spends time looking closely.",
+    personalities: ["intellectual", "creative"],
+    interests: ["art", "books"],
+    relationships: ["friend", "partner", "family"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 21,
+    category: "art",
+    brand: "ATELIER V",
+    name: "Handmade Stone Object",
+    price: 430,
+    budget: "300to1000",
+    image: images[11],
+    description:
+      "A tactile piece whose imperfections become part of its character.",
+    personalities: ["minimalist", "creative"],
+    interests: ["art", "home"],
+    relationships: ["partner", "friend", "family"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 22,
+    category: "art",
+    brand: "FORM ARCHIVE",
+    name: "Design Archive Box",
+    price: 510,
+    budget: "300to1000",
+    image: images[8],
+    description:
+      "A collectible object for someone fascinated by design history.",
+    personalities: ["intellectual", "creative"],
+    interests: ["art", "books"],
+    relationships: ["friend", "partner", "colleague"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 23,
+    category: "art",
+    brand: "STUDIO NINE",
+    name: "Limited Ceramic Vessel",
+    price: 620,
+    budget: "300to1000",
+    image: images[2],
+    description:
+      "A one-of-a-kind vessel intended to be displayed rather than simply used.",
+    personalities: ["creative", "minimalist"],
+    interests: ["art", "home"],
+    relationships: ["partner", "family", "special"],
+    intimacy: ["personal", "very-personal"]
+  },
+
+  {
+    id: 24,
+    category: "art",
+    brand: "RO EDITIONS",
+    name: "Collector's Art Book",
+    price: 240,
+    budget: "100to300",
+    image: images[1],
+    description:
+      "A tactile book object for evenings spent exploring artists and ideas.",
+    personalities: ["intellectual", "creative"],
+    interests: ["art", "books"],
+    relationships: ["friend", "partner", "family"],
+    intimacy: ["safe", "personal"]
+  },
+
+
+  /* =====================
+     BOOKS
+  ===================== */
+
+  {
+    id: 25,
+    category: "books",
+    brand: "RO LIBRARY",
+    name: "The Architecture Collection",
+    price: 120,
+    budget: "100to300",
+    image: images[6],
+    description:
+      "A substantial visual volume for anyone fascinated by architecture and space.",
+    personalities: ["intellectual", "creative"],
+    interests: ["books", "art"],
+    relationships: ["friend", "family", "partner"],
+    intimacy: ["safe"]
+  },
+
+  {
+    id: 26,
+    category: "books",
+    brand: "PRIVATE EDITIONS",
+    name: "Modern Art: A Collector's Volume",
+    price: 185,
+    budget: "100to300",
+    image: images[5],
+    description:
+      "An elegant reference volume for slow evenings and curious minds.",
+    personalities: ["intellectual", "creative"],
+    interests: ["books", "art"],
+    relationships: ["friend", "partner", "family"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 27,
+    category: "books",
+    brand: "MONOGRAPH",
+    name: "The World of Film",
+    price: 140,
+    budget: "100to300",
+    image: images[7],
+    description:
+      "A richly illustrated exploration of cinema for someone who notices atmosphere and detail.",
+    personalities: ["intellectual", "creative"],
+    interests: ["books", "art"],
+    relationships: ["friend", "partner", "colleague"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 28,
+    category: "books",
+    brand: "RO LIBRARY",
+    name: "A Life in Objects",
+    price: 95,
+    budget: "under100",
+    image: images[9],
+    description:
+      "A thoughtful collection exploring the stories hidden inside everyday objects.",
+    personalities: ["intellectual", "minimalist"],
+    interests: ["books", "home"],
+    relationships: ["friend", "family", "colleague"],
+    intimacy: ["safe"]
+  },
+
+  {
+    id: 29,
+    category: "books",
+    brand: "EDITION 21",
+    name: "Contemporary Interiors",
+    price: 160,
+    budget: "100to300",
+    image: images[10],
+    description:
+      "A visual reference for someone who cares deeply about their surroundings.",
+    personalities: ["creative", "minimalist"],
+    interests: ["books", "home"],
+    relationships: ["friend", "partner", "family"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 30,
+    category: "books",
+    brand: "ATELIER BOOKS",
+    name: "The Art of Travel",
+    price: 135,
+    budget: "100to300",
+    image: images[3],
+    description:
+      "A beautifully considered book for travellers who collect experiences rather than souvenirs.",
+    personalities: ["adventurous", "intellectual"],
+    interests: ["books", "experience"],
+    relationships: ["friend", "partner", "family"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 31,
+    category: "books",
+    brand: "PRIVATE LIBRARY",
+    name: "The Collector's Handbook",
+    price: 210,
+    budget: "100to300",
+    image: images[0],
+    description:
+      "A reference object for someone who enjoys discovering, collecting and curating.",
+    personalities: ["intellectual", "classic"],
+    interests: ["books", "art"],
+    relationships: ["friend", "partner", "colleague"],
+    intimacy: ["safe"]
+  },
+
+  {
+    id: 32,
+    category: "books",
+    brand: "RO EDITIONS",
+    name: "Photography: The Complete Archive",
+    price: 260,
+    budget: "100to300",
+    image: images[4],
+    description:
+      "A substantial photography volume for someone who sees the world through images.",
+    personalities: ["creative", "intellectual"],
+    interests: ["books", "art"],
+    relationships: ["friend", "partner", "family"],
+    intimacy: ["personal"]
+  },
+
+
+  /* =====================
+     HOME
+  ===================== */
+
+  {
+    id: 33,
+    category: "home",
+    brand: "FORME HOME",
+    name: "Hand-Blown Glass Vase",
+    price: 170,
+    budget: "100to300",
+    image: images[11],
+    description:
+      "A sculptural everyday object designed to quietly change the feeling of a room.",
+    personalities: ["minimalist", "creative"],
+    interests: ["home", "art"],
+    relationships: ["family", "friend", "partner"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 34,
+    category: "home",
+    brand: "MAISON RO",
+    name: "Stone Candle Vessel",
+    price: 110,
+    budget: "100to300",
+    image: images[10],
+    description:
+      "A tactile candle object intended to remain beautiful even after the flame is gone.",
+    personalities: ["minimalist", "classic"],
+    interests: ["home"],
+    relationships: ["friend", "family", "partner"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 35,
+    category: "home",
+    brand: "ATELIER N",
+    name: "Linen Throw",
+    price: 240,
+    budget: "100to300",
+    image: images[1],
+    description:
+      "A relaxed textile for someone who appreciates natural materials and quiet interiors.",
+    personalities: ["minimalist", "classic"],
+    interests: ["home"],
+    relationships: ["family", "partner", "friend"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 36,
+    category: "home",
+    brand: "STUDIO 08",
+    name: "Sculptural Table Lamp",
+    price: 680,
+    budget: "300to1000",
+    image: images[2],
+    description:
+      "A functional object with enough presence to become part of the architecture of a room.",
+    personalities: ["creative", "minimalist"],
+    interests: ["home", "art"],
+    relationships: ["partner", "family", "special"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 37,
+    category: "home",
+    brand: "RO OBJECTS",
+    name: "Marble Desk Tray",
+    price: 145,
+    budget: "100to300",
+    image: images[5],
+    description:
+      "A quiet desk object for someone who likes order and beautiful materials.",
+    personalities: ["minimalist", "intellectual"],
+    interests: ["home"],
+    relationships: ["colleague", "friend", "partner"],
+    intimacy: ["safe"]
+  },
+
+  {
+    id: 38,
+    category: "home",
+    brand: "FORM ARCHIVE",
+    name: "Oak Serving Board",
+    price: 130,
+    budget: "100to300",
+    image: images[6],
+    description:
+      "A warm, tactile object made for slow breakfasts and long dinners.",
+    personalities: ["classic", "minimalist"],
+    interests: ["home", "gastronomy"],
+    relationships: ["family", "friend", "partner"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 39,
+    category: "home",
+    brand: "MAISON EIGHT",
+    name: "Handmade Ceramic Set",
+    price: 320,
+    budget: "300to1000",
+    image: images[7],
+    description:
+      "A small collection of imperfect ceramic forms designed for everyday rituals.",
+    personalities: ["creative", "minimalist"],
+    interests: ["home", "gastronomy"],
+    relationships: ["partner", "family", "friend"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 40,
+    category: "home",
+    brand: "NORTH STUDIO",
+    name: "Wool & Cashmere Blanket",
+    price: 540,
+    budget: "300to1000",
+    image: images[8],
+    description:
+      "A generous textile for someone who values comfort, tactility and understated luxury.",
+    personalities: ["classic", "minimalist"],
+    interests: ["home"],
+    relationships: ["partner", "family", "special"],
+    intimacy: ["personal", "very-personal"]
+  },
+
+
+  /* =====================
+     GASTRONOMY
+  ===================== */
+
+  {
+    id: 41,
+    category: "gastronomy",
+    brand: "PRIVATE TABLE",
+    name: "Single-Origin Chocolate Collection",
+    price: 75,
+    budget: "under100",
+    image: images[9],
+    description:
+      "A carefully selected tasting collection for someone who notices flavour and detail.",
+    personalities: ["classic", "intellectual"],
+    interests: ["gastronomy"],
+    relationships: ["friend", "family", "colleague", "partner"],
+    intimacy: ["safe"]
+  },
+
+  {
+    id: 42,
+    category: "gastronomy",
+    brand: "MAISON DU GOUT",
+    name: "Rare Tea Collection",
+    price: 95,
+    budget: "under100",
+    image: images[10],
+    description:
+      "A quiet ritual presented through a selection of unusual loose-leaf teas.",
+    personalities: ["minimalist", "intellectual"],
+    interests: ["gastronomy"],
+    relationships: ["friend", "family", "colleague", "partner"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 43,
+    category: "gastronomy",
+    brand: "PRIVATE CELLAR",
+    name: "Artisan Coffee Selection",
+    price: 110,
+    budget: "100to300",
+    image: images[11],
+    description:
+      "A curated selection for someone who treats their morning ritual seriously.",
+    personalities: ["minimalist", "adventurous"],
+    interests: ["gastronomy"],
+    relationships: ["friend", "colleague", "partner", "family"],
+    intimacy: ["safe"]
+  },
+
+  {
+    id: 44,
+    category: "gastronomy",
+    brand: "ATELIER DU GOUT",
+    name: "Olive Oil Tasting Set",
+    price: 135,
+    budget: "100to300",
+    image: images[3],
+    description:
+      "A tasting set designed to make an ordinary dinner feel considered.",
+    personalities: ["classic", "intellectual"],
+    interests: ["gastronomy"],
+    relationships: ["family", "friend", "partner"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 45,
+    category: "gastronomy",
+    brand: "MAISON RO",
+    name: "Chef's Table Experience",
+    price: 450,
+    budget: "300to1000",
+    image: images[2],
+    description:
+      "An evening built around food, atmosphere and the pleasure of being looked after.",
+    personalities: ["adventurous", "classic"],
+    interests: ["gastronomy", "experience"],
+    relationships: ["partner", "special", "family"],
+    intimacy: ["personal", "very-personal"]
+  },
+
+  {
+    id: 46,
+    category: "gastronomy",
+    brand: "PRIVATE TABLE",
+    name: "Luxury Breakfast Box",
+    price: 180,
+    budget: "100to300",
+    image: images[0],
+    description:
+      "A generous morning ritual for birthdays, celebrations and quiet surprises.",
+    personalities: ["classic", "minimalist"],
+    interests: ["gastronomy"],
+    relationships: ["partner", "family", "friend"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 47,
+    category: "gastronomy",
+    brand: "RO RESERVE",
+    name: "Private Tasting Evening",
+    price: 760,
+    budget: "300to1000",
+    image: images[5],
+    description:
+      "An intimate tasting experience designed for a memorable evening together.",
+    personalities: ["adventurous", "classic"],
+    interests: ["gastronomy", "experience"],
+    relationships: ["partner", "special"],
+    intimacy: ["very-personal"]
+  },
+
+  {
+    id: 48,
+    category: "gastronomy",
+    brand: "MAISON DU GOUT",
+    name: "Chocolate & Tea Pairing Set",
+    price: 155,
+    budget: "100to300",
+    image: images[7],
+    description:
+      "A refined pairing designed for slow afternoons and shared conversation.",
+    personalities: ["classic", "intellectual"],
+    interests: ["gastronomy"],
+    relationships: ["friend", "partner", "family"],
+    intimacy: ["personal"]
+  },
+
+
+  /* =====================
+     EXPERIENCES
+  ===================== */
+
+  {
+    id: 49,
+    category: "experience",
+    brand: "RO PRIVATE",
+    name: "Private Museum Evening",
+    price: 280,
+    budget: "100to300",
+    image: images[4],
+    description:
+      "An evening centred around art, conversation and the feeling of having nowhere else to be.",
+    personalities: ["intellectual", "creative"],
+    interests: ["experience", "art"],
+    relationships: ["partner", "friend", "special"],
+    intimacy: ["personal", "very-personal"]
+  },
+
+  {
+    id: 50,
+    category: "experience",
+    brand: "PRIVATE JOURNEYS",
+    name: "Weekend Escape",
+    price: 850,
+    budget: "300to1000",
+    image: images[8],
+    description:
+      "A carefully planned short escape for someone who would rather collect memories than objects.",
+    personalities: ["adventurous", "classic"],
+    interests: ["experience"],
+    relationships: ["partner", "special", "family"],
+    intimacy: ["very-personal"]
+  },
+
+  {
+    id: 51,
+    category: "experience",
+    brand: "ATELIER RO",
+    name: "Private Art Workshop",
+    price: 190,
+    budget: "100to300",
+    image: images[6],
+    description:
+      "A hands-on creative afternoon designed around curiosity rather than expertise.",
+    personalities: ["creative", "adventurous"],
+    interests: ["experience", "art"],
+    relationships: ["friend", "partner", "family"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 52,
+    category: "experience",
+    brand: "RO PRIVATE",
+    name: "Architectural Walking Tour",
+    price: 120,
+    budget: "100to300",
+    image: images[3],
+    description:
+      "A private exploration of buildings, streets and the stories behind them.",
+    personalities: ["intellectual", "adventurous"],
+    interests: ["experience", "art"],
+    relationships: ["friend", "partner", "colleague"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 53,
+    category: "experience",
+    brand: "PRIVATE TABLE",
+    name: "Chef's Counter Evening",
+    price: 340,
+    budget: "300to1000",
+    image: images[10],
+    description:
+      "An intimate culinary experience designed for someone who enjoys discovering new flavours.",
+    personalities: ["adventurous", "intellectual"],
+    interests: ["experience", "gastronomy"],
+    relationships: ["partner", "friend", "special"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 54,
+    category: "experience",
+    brand: "NORTH JOURNEYS",
+    name: "Private Photography Walk",
+    price: 160,
+    budget: "100to300",
+    image: images[11],
+    description:
+      "A slow afternoon learning to see familiar places differently.",
+    personalities: ["creative", "adventurous"],
+    interests: ["experience", "art"],
+    relationships: ["friend", "partner"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 55,
+    category: "experience",
+    brand: "RO RESERVE",
+    name: "Weekend Country Retreat",
+    price: 980,
+    budget: "300to1000",
+    image: images[1],
+    description:
+      "A quiet two-day retreat designed around rest, food and beautiful surroundings.",
+    personalities: ["minimalist", "adventurous"],
+    interests: ["experience"],
+    relationships: ["partner", "special", "family"],
+    intimacy: ["very-personal"]
+  },
+
+  {
+    id: 56,
+    category: "experience",
+    brand: "PRIVATE JOURNEYS",
+    name: "Curated City Weekend",
+    price: 1250,
+    budget: "1000plus",
+    image: images[9],
+    description:
+      "A fully considered city escape built around architecture, food and culture.",
+    personalities: ["adventurous", "intellectual"],
+    interests: ["experience", "art", "gastronomy"],
+    relationships: ["partner", "special"],
+    intimacy: ["very-personal"]
+  },
+
+
+  /* =====================
+     EXTRA OBJECTS
+  ===================== */
+
+  {
+    id: 57,
+    category: "home",
+    brand: "RO OBJECTS",
+    name: "Brass Desk Clock",
+    price: 210,
+    budget: "100to300",
+    image: images[2],
+    description:
+      "A small architectural object for a desk, library or bedside table.",
+    personalities: ["classic", "intellectual"],
+    interests: ["home"],
+    relationships: ["colleague", "family", "friend"],
+    intimacy: ["safe"]
+  },
+
+  {
+    id: 58,
+    category: "fashion",
+    brand: "FORME",
+    name: "Leather Travel Journal",
+    price: 125,
+    budget: "100to300",
+    image: images[4],
+    description:
+      "A tactile notebook for plans, observations and places worth remembering.",
+    personalities: ["adventurous", "intellectual"],
+    interests: ["fashion", "books"],
+    relationships: ["friend", "partner", "colleague"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 59,
+    category: "art",
+    brand: "EDITION RO",
+    name: "Small Bronze Sculpture",
+    price: 880,
+    budget: "300to1000",
+    image: images[8],
+    description:
+      "A compact sculptural piece with the presence of a collector's object.",
+    personalities: ["classic", "creative"],
+    interests: ["art", "home"],
+    relationships: ["partner", "family", "special"],
+    intimacy: ["personal", "very-personal"]
+  },
+
+  {
+    id: 60,
+    category: "books",
+    brand: "PRIVATE LIBRARY",
+    name: "The Art of Interiors",
+    price: 175,
+    budget: "100to300",
+    image: images[10],
+    description:
+      "A visual exploration of interiors, materials and the philosophy of space.",
+    personalities: ["creative", "intellectual"],
+    interests: ["books", "home", "art"],
+    relationships: ["friend", "partner", "family"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 61,
+    category: "jewellery",
+    brand: "MAISON LUNE",
+    name: "Minimal Silver Earrings",
+    price: 195,
+    budget: "100to300",
+    image: images[3],
+    description:
+      "Simple enough for everyday wear, considered enough to feel like a gift.",
+    personalities: ["minimalist", "classic"],
+    interests: ["jewellery"],
+    relationships: ["partner", "friend", "family"],
+    intimacy: ["personal"]
+  },
+
+  {
+    id: 62,
+    category: "home",
+    brand: "STUDIO N",
+    name: "Handmade Incense Holder",
+    price: 85,
+    budget: "under100",
+    image: images[7],
+    description:
+      "A small ritual object for quiet evenings and slower routines.",
+    personalities: ["minimalist", "creative"],
+    interests: ["home"],
+    relationships: ["friend", "family", "partner"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 63,
+    category: "gastronomy",
+    brand: "PRIVATE TABLE",
+    name: "Rare Chocolate & Coffee Box",
+    price: 145,
+    budget: "100to300",
+    image: images[5],
+    description:
+      "A compact tasting collection for someone who enjoys small daily luxuries.",
+    personalities: ["classic", "intellectual"],
+    interests: ["gastronomy"],
+    relationships: ["friend", "family", "colleague", "partner"],
+    intimacy: ["safe", "personal"]
+  },
+
+  {
+    id: 64,
+    category: "experience",
+    brand: "RO PRIVATE",
+    name: "Private Cinema Evening",
+    price: 420,
+    budget: "300to1000",
+    image: images[6],
+    description:
+      "A cinematic evening arranged around a film chosen specifically for them.",
+    personalities: ["creative", "intellectual"],
+    interests: ["experience", "art"],
+    relationships: ["partner", "friend", "special"],
+    intimacy: ["personal", "very-personal"]
+  }
+
+];
+
+
+/* =========================================
+   START QUIZ
+========================================= */
+
+function startQuiz() {
+
+  currentQuestion = 0;
+  quizAnswers = {};
+
+  renderQuiz();
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+
+/* =========================================
+   RENDER QUIZ
+========================================= */
+
+function renderQuiz() {
+
+  const main = document.querySelector("main");
+
+  if (!main) return;
+
+  const question = questions[currentQuestion];
+
+  main.innerHTML = `
+
+    <section class="quiz" style="display:flex;">
+
+      <div class="quiz-inner">
+
+        <p class="eyebrow">
+          ${question.eyebrow}
+        </p>
+
+        <div class="quiz-progress">
+
+          <span>
+            ${String(currentQuestion + 1).padStart(2, "0")}
+          </span>
+
+          <div class="progress-line"></div>
+
+          <span>
+            ${String(questions.length).padStart(2, "0")}
+          </span>
+
+        </div>
+
+        <h2>
+          ${question.title}
+        </h2>
+
+        <p class="quiz-description">
+          ${question.description}
+        </p>
+
+        <div class="quiz-options">
+
+          ${question.options.map((option, index) => `
+
+            <button
+              class="quiz-option"
+              onclick="selectAnswer('${option[0]}')"
+            >
+
+              <span>
+                ${String(index + 1).padStart(2, "0")}
+              </span>
+
+              ${option[1]}
+
+            </button>
+
+          `).join("")}
+
+        </div>
+
+      </div>
+
+    </section>
+
+  `;
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+
+/* =========================================
+   SELECT ANSWER
+========================================= */
+
+function selectAnswer(answer) {
+
+  const question = questions[currentQuestion];
+
+  quizAnswers[question.key] = answer;
+
+  currentQuestion++;
+
+  if (currentQuestion < questions.length) {
+
+    renderQuiz();
+
+  } else {
+
+    showResults();
+
+  }
+}
+
+
+/* =========================================
+   CALCULATE RECOMMENDATIONS
+========================================= */
+
+function calculateRecommendations() {
+
+  return gifts.map(gift => {
+
+    let score = 0;
+
+    const answers = quizAnswers;
+
+
+    /* Relationship */
+
+    if (
+      gift.relationships &&
+      gift.relationships.includes(answers.relationship)
+    ) {
+      score += 12;
+    }
+
+
+    /* Personality */
+
+    if (
+      gift.personalities &&
+      gift.personalities.includes(answers.personality)
+    ) {
+      score += 10;
+    }
+
+
+    /* Interest */
+
+    if (
+      gift.interests &&
+      gift.interests.includes(answers.interest)
+    ) {
+      score += 18;
+    }
+
+
+    /* Intimacy */
+
+    if (
+      gift.intimacy &&
+      gift.intimacy.includes(answers.intimacy)
+    ) {
+      score += 9;
+    }
+
+
+    /* Budget */
+
+    if (gift.budget === answers.budget) {
+
+      score += 20;
+
+    } else {
+
+      if (
+        answers.budget === "under100" &&
+        gift.price <= 150
+      ) {
+        score += 7;
+      }
+
+      if (
+        answers.budget === "100to300" &&
+        gift.price <= 500
+      ) {
+        score += 7;
+      }
+
+      if (
+        answers.budget === "300to1000" &&
+        gift.price <= 1200
+      ) {
+        score += 5;
+      }
+
+    }
+
+
+    /* Special relationship */
+
+    if (
+      answers.relationship === "partner" &&
+      answers.intimacy === "very-personal"
+    ) {
+      if (
+        gift.relationships.includes("partner") &&
+        gift.intimacy.includes("very-personal")
+      ) {
+        score += 8;
+      }
+    }
+
+
+    if (
+      answers.relationship === "special" &&
+      answers.intimacy === "very-personal"
+    ) {
+      if (gift.intimacy.includes("very-personal")) {
+        score += 10;
+      }
+    }
+
+
+    /* Colleague */
+
+    if (
+      answers.relationship === "colleague" &&
+      answers.intimacy === "safe"
+    ) {
+
+      if (
+        gift.relationships.includes("colleague")
+      ) {
+        score += 7;
+      }
+
+    }
+
+
+    /* Creative */
+
+    if (
+      answers.personality === "creative" &&
+      ["art", "home"].includes(gift.category)
+    ) {
+      score += 7;
+    }
+
+
+    /* Intellectual */
+
+    if (
+      answers.personality === "intellectual" &&
+      ["books", "art"].includes(gift.category)
+    ) {
+      score += 7;
+    }
+
+
+    /* Adventurous */
+
+    if (
+      answers.personality === "adventurous" &&
+      gift.category === "experience"
+    ) {
+      score += 10;
+    }
+
+
+    /* Minimalist */
+
+    if (
+      answers.personality === "minimalist" &&
+      ["home", "fashion", "art"].includes(gift.category)
+    ) {
+      score += 5;
+    }
+
+
+    /* Urgency */
+
+    if (
+      answers.urgency === "today" &&
+      gift.category === "experience"
+    ) {
+      score -= 8;
+    }
+
+
+    /* Low budget protection */
+
+    if (
+      answers.budget === "under100" &&
+      gift.price > 150
+    ) {
+      score -= 18;
+    }
+
+
+    if (
+      answers.budget === "100to300" &&
+      gift.price > 500
+    ) {
+      score -= 12;
+    }
+
+
+    return {
+      ...gift,
+      score
+    };
+
+  }).sort((a, b) => b.score - a.score);
+}
+
+
+/* =========================================
+   DIVERSIFY CATEGORIES
+========================================= */
+
+function diversifyRecommendations(items, limit) {
+
+  const result = [];
+  const categoryCounts = {};
+
+  for (const item of items) {
+
+    const category = item.category;
+
+    if (!categoryCounts[category]) {
+      categoryCounts[category] = 0;
+    }
+
+    if (categoryCounts[category] >= 4) {
+      continue;
+    }
+
+    result.push(item);
+
+    categoryCounts[category]++;
+
+    if (result.length >= limit) {
+      break;
+    }
+  }
+
+  return result;
+}
+
+
+/* =========================================
+   SHOW RESULTS
+========================================= */
+
+function showResults() {
+
+  currentRecommendations = diversifyRecommendations(
+    calculateRecommendations(),
+    gifts.length
+  );
+
+  visibleRecommendations = 12;
+
+  currentCategory = "all";
+
+  const main = document.querySelector("main");
+
+  if (!main) return;
+
+  main.innerHTML = `
+
+    <div class="results-page">
+
+      <div class="results-header">
+
+        <p class="eyebrow">
+          YOUR RO SELECTION
+        </p>
+
+        <h2>
+          Objects worth
+          <br>
+          considering.
+        </h2>
+
+        <p class="results-intro">
+          Based on what you've told us, we've selected
+          a considered collection of objects around the
+          person, the occasion and your intended gesture.
+        </p>
+
+      </div>
+
+
+      <div class="selection-meta">
+
+        <span>
+          RO / SELECTION
+        </span>
+
+        <span id="selection-count">
+          ${Math.min(
+            visibleRecommendations,
+            currentRecommendations.length
+          )}
+          OF
+          ${currentRecommendations.length}
+          OBJECTS
+        </span>
+
+      </div>
+
+
+      <div class="results-filters">
+
+        ${createFilterButton("all", "All", true)}
+
+        ${createFilterButton("fashion", "Fashion")}
+
+        ${createFilterButton("jewellery", "Jewellery")}
+
+        ${createFilterButton("art", "Art")}
+
+        ${createFilterButton("books", "Books")}
+
+        ${createFilterButton("home", "Home")}
+
+        ${createFilterButton("gastronomy", "Gastronomy")}
+
+        ${createFilterButton("experience", "Experiences")}
+
+      </div>
+
+
+      <div
+        class="recommendations"
+        id="recommendations-grid"
+      ></div>
+
+
+      <div
+        class="load-more-wrapper"
+        id="load-more-wrapper"
+      ></div>
+
+
+      <section class="concierge-block">
+
+        <div class="concierge-text">
+
+          <p class="concierge-label">
+            RO PRIVATE CONCIERGE
+          </p>
+
+          <h3>
+            Looking for
+            something more personal?
+          </h3>
+
+          <p>
+            Tell us what you have in mind.
+            Our concierge can help you find
+            an object beyond the selection.
+          </p>
+
+        </div>
+
+
+        <div class="concierge-action">
+
+          <button
+            class="concierge-button"
+            onclick="contactConcierge()"
+          >
+            Speak with a concierge >
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <div class="restart-wrapper">
+
+        <button
+          class="restart-button"
+          onclick="restartQuiz()"
+        >
+          Start again
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+  renderRecommendations();
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+
+/* =========================================
+   FILTER BUTTON
+========================================= */
+
+function createFilterButton(
+  category,
+  label,
+  active = false
+) {
+
+  return `
+
+    <button
+      class="results-filter ${active ? "active" : ""}"
+      onclick="filterRecommendations('${category}', this)"
+    >
+      ${label}
+    </button>
+
+  `;
+}
+
+
+/* =========================================
+   FILTER RECOMMENDATIONS
+========================================= */
+
+function filterRecommendations(
+  category,
+  button
+) {
+
+  currentCategory = category;
+
+  document
+    .querySelectorAll(".results-filter")
+    .forEach(item => {
+      item.classList.remove("active");
+    });
+
+  if (button) {
+    button.classList.add("active");
+  }
+
+  visibleRecommendations = 12;
+
+  renderRecommendations();
+}
+
+
+/* =========================================
+   RENDER RECOMMENDATIONS
+========================================= */
+
+function renderRecommendations() {
+
+  const grid = document.getElementById(
+    "recommendations-grid"
+  );
+
+  const loadMore = document.getElementById(
+    "load-more-wrapper"
+  );
+
+  const count = document.getElementById(
+    "selection-count"
+  );
+
+  if (!grid) return;
+
+
+  let items = currentRecommendations;
+
+
+  if (currentCategory !== "all") {
+
+    items = currentRecommendations.filter(
+      gift => gift.category === currentCategory
+    );
+
+  }
+
+
+  const visibleItems = items.slice(
+    0,
+    visibleRecommendations
+  );
+
+
+  grid.innerHTML = visibleItems.map(
+    (gift, index) => {
+
+      const saved = savedGifts.includes(gift.id);
+
+      return `
+
+        <article class="recommendation-card">
+
+          <div class="recommendation-image">
+
+            <img
+              src="${gift.image}"
+              alt="${escapeHTML(gift.name)}"
+              loading="lazy"
+            >
+
+            <button
+              class="save-button"
+              onclick="saveGift(${gift.id})"
+              aria-label="Save gift"
+            >
+              ${saved ? "¦" : "?"}
+            </button>
+
+          </div>
+
+
+          <div class="recommendation-content">
+
+            <div class="recommendation-number">
+              ${String(index + 1).padStart(2, "0")}
+            </div>
+
+            <div class="recommendation-brand">
+              ${escapeHTML(gift.brand)}
+            </div>
+
+            <div class="recommendation-info">
+
+              <h3>
+                ${escapeHTML(gift.name)}
+              </h3>
+
+              <div class="recommendation-price">
+                ˆ${gift.price.toLocaleString()}
+              </div>
+
+              <p class="recommendation-reason">
+                ${escapeHTML(gift.description)}
+              </p>
+
+              <a
+                href="#"
+                class="view-object"
+                onclick="viewGift(${gift.id}); return false;"
+              >
+                View object >
+              </a>
+
+            </div>
+
+          </div>
+
+        </article>
+
+      `;
+
+    }
+  ).join("");
+
+
+  if (count) {
+
+    count.textContent =
+      `${visibleItems.length} OF ${items.length} OBJECTS`;
+
+  }
+
+
+  if (loadMore) {
+
+    if (visibleItems.length < items.length) {
+
+      loadMore.innerHTML = `
+
+        <button
+          class="load-more-button"
+          onclick="loadMoreRecommendations()"
+        >
+          View more selections
+        </button>
+
+      `;
+
+    } else {
+
+      loadMore.innerHTML = "";
+
+    }
+
+  }
+
+}
+
+
+/* =========================================
+   LOAD MORE
+========================================= */
+
+function loadMoreRecommendations() {
+
+  visibleRecommendations += 12;
+
+  renderRecommendations();
+
+}
+
+
+/* =========================================
+   SAVE GIFT
+========================================= */
+
+function saveGift(id) {
+
+  if (savedGifts.includes(id)) {
+
+    savedGifts = savedGifts.filter(
+      giftId => giftId !== id
+    );
+
+  } else {
+
+    savedGifts.push(id);
+
+  }
+
+  localStorage.setItem(
+    "ro_saved_gifts",
+    JSON.stringify(savedGifts)
+  );
+
+  renderRecommendations()
+    <button
+  class="view-object"
+  onclick="viewGift(${gift.id}
+>
+  View object >
+</button>);
+
+}
+
+
+/* =========================================
+   VIEW OBJECT
+========================================= */
+
+function viewGift(id) {
+  const gift = gifts.find(item => item.id === Number(id));
+
+  if (!gift) {
+    console.error("Gift not found:", id);
+    return;
+  }
+
+  const saved = savedGifts.includes(gift.id);
+
+  const modal = document.createElement("div");
+  modal.className = "object-modal open";
+
+  modal.innerHTML = `
+    <div class="object-modal-inner">
+
+      <button
+        class="object-modal-close"
+        type="button"
+        aria-label="Close"
+      >?</button>
+
+      <div class="object-modal-image">
+        <img
+          src="${gift.image}"
+          alt="${escapeHTML(gift.name)}"
+        >
+      </div>
+
+      <div class="object-modal-content">
+
+        <div class="object-modal-brand">
+          ${escapeHTML(gift.brand)}
+        </div>
+
+        <h2>
+          ${escapeHTML(gift.name)}
+        </h2>
+
+        <div class="object-modal-price">
+          ˆ${Number(gift.price).toLocaleString()}
+        </div>
+
+        <p class="object-modal-description">
+          ${escapeHTML(gift.description)}
+        </p>
+
+        <div class="object-modal-reason">
+
+          <div class="object-modal-reason-label">
+            WHY RO SELECTED IT
+          </div>
+
+          <p>
+            Chosen around the person, the occasion
+            and the feeling behind your gesture.
+          </p>
+
+        </div>
+
+        <div class="object-modal-actions">
+
+          <button
+            type="button"
+            class="object-modal-save"
+            id="modal-save-button"
+          >
+            ${saved ? "¦ Saved" : "? Save object"}
+          </button>
+
+          <button
+            type="button"
+            class="object-modal-concierge"
+            id="modal-concierge-button"
+          >
+            Ask RO Concierge >
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const closeButton =
+    modal.querySelector(".object-modal-close");
+
+  closeButton.addEventListener("click", closeObjectModal);
+
+  modal.addEventListener("click", function(event) {
+    if (event.target === modal) {
+      closeObjectModal();
+    }
+  });
+
+  const saveButton =
+    modal.querySelector("#modal-save-button");
+
+  saveButton.addEventListener("click", function() {
+    saveGift(id);
+    closeObjectModal();
+  });
+
+  const conciergeButton =
+    modal.querySelector("#modal-concierge-button");
+
+  conciergeButton.addEventListener("click", function() {
+    contactConcierge();
+  });
+
+  document.addEventListener("keydown", handleModalEscape);
+}
+
+
+function closeObjectModal() {
+
+  const modal =
+    document.querySelector(".object-modal");
+
+  if (modal) {
+    modal.remove();
+  }
+
+  document.removeEventListener(
+    "keydown",
+    handleModalEscape
+  );
+}
+
+
+function handleModalEscape(event) {
+
+  if (event.key === "Escape") {
+    closeObjectModal();
+  }
+
+}
+
+
+function closeObjectModal() {
+
+  const modal =
+    document.querySelector(".object-modal");
+
+  if (modal) {
+    modal.remove();
+  }
+
+  document.removeEventListener(
+    "keydown",
+    handleModalEscape
+  );
+
+}
+
+
+function handleModalEscape(event) {
+
+  if (event.key === "Escape") {
+    closeObjectModal();
+  }
+
+}
+
+
+function saveGiftFromModal(id) {
+
+  saveGift(id);
+
+  const modal =
+    document.querySelector(".object-modal");
+
+  if (modal) {
+    modal.remove();
+  }
+
+  viewGift(id);
+
+}
+
+
+/* =========================================
+   CONCIERGE
+========================================= */
+
+function contactConcierge() {
+
+  alert(
+    "RO Private Concierge\n\n" +
+    "The private concierge service is currently being prepared.\n\n" +
+    "Soon you will be able to speak directly with an RO concierge."
+  );
+
+}
+
+
+/* =========================================
+   RESTART
+========================================= */
+
+function restartQuiz() {
+
+  currentQuestion = 0;
+  quizAnswers = {};
+
+  renderQuiz();
+
+}
+
+
+/* =========================================
+   ESCAPE HTML
+========================================= */
+
+function escapeHTML(text) {
+
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+/* =========================================
+   INITIALIZATION
+========================================= */
+
+console.log(
+  "RO / Refined Objects loaded successfully."
+);
+
+console.log(
+  `Gift catalog: ${gifts.length} objects`
+);
