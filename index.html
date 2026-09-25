@@ -1,5 +1,5 @@
 /* =========================================
-   RO — REFINED OBJECTS
+   RO â€” REFINED OBJECTS
    GIFT CONCIERGE
 ========================================= */
 
@@ -64,10 +64,10 @@ const questions = [
       "There is no right answer. We simply use your range to make the selection more relevant.",
 
     options: [
-      ["under100", "Under ˆ100"],
-      ["100to300", "ˆ100 — ˆ300"],
-      ["300to1000", "ˆ300 — ˆ1,000"],
-      ["1000plus", "ˆ1,000+"]
+      ["under100", "Under Ë†100"],
+      ["100to300", "Ë†100 â€” Ë†300"],
+      ["300to1000", "Ë†300 â€” Ë†1,000"],
+      ["1000plus", "Ë†1,000+"]
     ]
   },
 
@@ -1893,7 +1893,7 @@ function renderRecommendations() {
               onclick="saveGift(${gift.id})"
               aria-label="Save gift"
             >
-              ${saved ? "¦" : "?"}
+              ${saved ? "Â¦" : "?"}
             </button>
 
           </div>
@@ -1916,7 +1916,7 @@ function renderRecommendations() {
               </h3>
 
               <div class="recommendation-price">
-                ˆ${gift.price.toLocaleString()}
+                Ë†${gift.price.toLocaleString()}
               </div>
 
               <p class="recommendation-reason">
@@ -2068,7 +2068,7 @@ function viewGift(id) {
         </h2>
 
         <div class="object-modal-price">
-          ˆ${Number(gift.price).toLocaleString()}
+          Ë†${Number(gift.price).toLocaleString()}
         </div>
 
         <p class="object-modal-description">
@@ -2095,7 +2095,7 @@ function viewGift(id) {
             class="object-modal-save"
             id="modal-save-button"
           >
-            ${saved ? "¦ Saved" : "? Save object"}
+            ${saved ? "Â¦ Saved" : "? Save object"}
           </button>
 
           <button
